@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magic Cones · Content Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --forest: #173404; --canopy: #3B6D11; --meadow: #639922;
+  --sprout: #97C459; --mist: #C0DD97; --dew: #EAF3DE;
+  --cream: #F9F6EF; --amber: #EF9F27; --ink: #1C1C1A;
+  --red: #991B1B; --red-bg: #FEF2F2;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
+
+header {
+  background: var(--forest);
+  padding: 28px 40px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 16px;
+}
+.header-brand { display: flex; align-items: center; gap: 12px; }
+.header-leaf {
+  width: 36px; height: 36px; background: var(--sprout);
+  border-radius: 50% 10% 50% 10%;
+  display: flex; align-items: center; justify-content: center;
+}
+.header-leaf svg { width: 18px; height: 18px; fill: var(--forest); }
+.header-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 500; color: var(--dew); }
+.header-title span { color: var(--sprout); font-style: italic; }
+.header-sub { font-size: 12px; color: var(--mist); margin-top: 2px; }
+.header-badge {
+  font-size: 11px; font-weight: 500; letter-spacing: 1px;
+  padding: 6px 14px; border-radius: 20px;
+  background: rgba(151,196,89,0.15); color: var(--sprout);
+  border: 1px solid rgba(151,196,89,0.3);
+  display: flex; align-items: center; gap: 6px;
+}
+.header-badge::before {
+  content: ''; width: 6px; height: 6px;
+  background: var(--sprout); border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.founder-strip {
+  background: #0F2E04; padding: 12px 40px;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.founder-strip-text { font-size: 12px; color: var(--mist); line-height: 1.5; }
+.founder-strip-text strong { color: var(--sprout); font-weight: 500; }
+.founder-tag {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.8px;
+  text-transform: uppercase; color: var(--sprout);
+  background: rgba(151,196,89,0.1); border: 1px solid rgba(151,196,89,0.2);
+  padding: 3px 10px; border-radius: 10px; white-space: nowrap;
+}
+
+.mode-tabs {
+  background: #fff; border-bottom: 1px solid #E4EDD8;
+  padding: 0 40px; display: flex; gap: 0;
+}
+.mode-tab {
+  padding: 18px 28px; font-size: 14px; font-weight: 500;
+  color: var(--canopy); cursor: pointer; border: none;
+  background: transparent; font-family: 'DM Sans', sans-serif;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+  display: flex; align-items: center; gap: 8px;
+}
+.mode-tab.active { color: var(--forest); border-bottom-color: var(--canopy); }
+.mode-tab:hover:not(.active) { color: var(--forest); }
+.mode-tab svg { width: 16px; height: 16px; }
+
+.main { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+.card {
+  background: #fff; border: 1px solid #E4EDD8;
+  border-radius: 20px; padding: 32px; margin-bottom: 20px;
+  box-shadow: 0 2px 20px #3B6D1106;
+}
+.card-title {
+  font-size: 11px; font-weight: 500; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--meadow);
+  margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+}
+.card-title::after { content: ''; flex: 1; height: 1px; background: var(--dew); }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.full { grid-column: 1 / -1; }
+.ctrl { display: flex; flex-direction: column; gap: 7px; }
+.ctrl label { font-size: 12px; font-weight: 500; color: var(--forest); }
+.ctrl label span { font-weight: 300; color: #8BAE6A; }
+
+select, input[type="text"], textarea {
+  width: 100%; padding: 10px 14px;
+  border: 1px solid #D8E8C4; border-radius: 10px;
+  font-size: 13px; font-family: 'DM Sans', sans-serif;
+  color: var(--ink); background: var(--cream);
+  outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none; -webkit-appearance: none;
+}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233B6D11' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  padding-right: 32px; cursor: pointer;
+}
+textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+select:focus, input:focus, textarea:focus { border-color: var(--canopy); box-shadow: 0 0 0 3px #3B6D1112; }
+
+.btn-generate {
+  width: 100%; padding: 14px 24px;
+  background: var(--forest); color: var(--dew);
+  border: none; border-radius: 14px;
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;
+  cursor: pointer; margin-top: 24px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: background 0.2s, transform 0.15s;
+}
+.btn-generate:hover { background: var(--canopy); }
+.btn-generate:active { transform: scale(0.99); }
+.btn-generate:disabled { background: #C4CEBC; cursor: not-allowed; }
+
+.btn-sm {
+  padding: 8px 16px; border-radius: 10px;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+  cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  transition: all 0.2s; border: 1px solid #D8E8C4;
+  background: #fff; color: var(--canopy);
+}
+.btn-sm:hover { background: var(--dew); }
+.btn-sm.dark { background: var(--forest); color: var(--dew); border-color: var(--forest); }
+.btn-sm.dark:hover { background: var(--canopy); }
+.btn-sm svg { width: 13px; height: 13px; }
+
+.loading { text-align: center; padding: 48px 0; animation: fadeIn 0.3s ease; }
+.loading-ring {
+  width: 44px; height: 44px;
+  border: 3px solid var(--dew); border-top-color: var(--canopy);
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+.loading p { font-size: 14px; color: var(--canopy); font-style: italic; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+.result-tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+.result-tab {
+  padding: 7px 16px; border-radius: 20px;
+  border: 1px solid #D8E8C4; background: transparent;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+  color: var(--canopy); cursor: pointer; transition: all 0.2s;
+}
+.result-tab.active { background: var(--forest); color: var(--sprout); border-color: var(--forest); }
+
+.result-card {
+  background: var(--dew); border: 1px solid var(--mist);
+  border-radius: 16px; padding: 24px;
+  animation: fadeIn 0.3s ease;
+}
+.result-platform {
+  font-size: 10px; font-weight: 500; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--canopy);
+  display: flex; align-items: center; gap: 6px; margin-bottom: 14px;
+}
+.caption-text { font-size: 15px; color: var(--forest); line-height: 1.8; white-space: pre-wrap; margin-bottom: 12px; }
+.hashtag-text { font-size: 13px; color: var(--meadow); line-height: 1.8; font-weight: 500; }
+.result-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 16px; padding-top: 14px;
+  border-top: 1px solid var(--mist); flex-wrap: wrap; gap: 10px;
+}
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { font-size: 11px; color: var(--canopy); background: #fff; border: 1px solid var(--mist); padding: 3px 10px; border-radius: 10px; }
+.action-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+
+.campaign-header {
+  background: var(--forest); border-radius: 16px;
+  padding: 24px 28px; margin-bottom: 20px; animation: fadeIn 0.3s ease;
+}
+.campaign-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 500; color: var(--dew); margin-bottom: 6px; }
+.campaign-meta { font-size: 13px; color: var(--mist); font-weight: 300; }
+
+.week-card {
+  background: #fff; border: 1px solid #E4EDD8;
+  border-radius: 16px; overflow: hidden; margin-bottom: 16px; animation: fadeIn 0.4s ease;
+}
+.week-header {
+  background: var(--dew); border-bottom: 1px solid var(--mist);
+  padding: 14px 20px;
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+}
+.week-label { font-size: 13px; font-weight: 500; color: var(--forest); }
+.week-theme { font-size: 11px; color: var(--canopy); font-style: italic; }
+.week-body { padding: 20px; }
+
+.post-item {
+  display: grid; grid-template-columns: 80px 1fr auto;
+  gap: 16px; align-items: start;
+  padding: 14px 0; border-bottom: 1px solid #F0F5E8;
+}
+.post-item:last-child { border-bottom: none; padding-bottom: 0; }
+.post-day { font-size: 12px; font-weight: 500; color: var(--meadow); }
+.post-platform-tag { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 8px; display: inline-block; margin-top: 3px; }
+.post-content-type { font-size: 11px; font-weight: 500; letter-spacing: 0.5px; color: var(--canopy); text-transform: uppercase; margin-bottom: 4px; }
+.post-idea { font-size: 13px; color: var(--ink); line-height: 1.5; margin-bottom: 4px; }
+.post-caption-preview { font-size: 12px; color: var(--canopy); font-style: italic; line-height: 1.5; }
+.post-copy-btn {
+  padding: 6px 12px; border-radius: 8px;
+  border: 1px solid #D8E8C4; background: #fff;
+  font-size: 11px; font-weight: 500; color: var(--canopy);
+  cursor: pointer; white-space: nowrap;
+  display: flex; align-items: center; gap: 4px;
+  transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+}
+.post-copy-btn:hover { background: var(--dew); }
+.post-copy-btn svg { width: 11px; height: 11px; }
+
+.campaign-summary {
+  background: var(--dew); border: 1px solid var(--mist);
+  border-radius: 16px; padding: 24px;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  margin-bottom: 20px; animation: fadeIn 0.5s ease;
+}
+.summary-stat { text-align: center; }
+.summary-num { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 500; color: var(--canopy); }
+.summary-label { font-size: 11px; color: var(--canopy); margin-top: 2px; }
+
+.tips-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 24px; }
+.tip { background: var(--dew); border-radius: 12px; padding: 16px; border: 1px solid var(--mist); }
+.tip-icon { font-size: 20px; margin-bottom: 8px; }
+.tip-title { font-size: 12px; font-weight: 500; color: var(--forest); margin-bottom: 4px; }
+.tip-text { font-size: 11px; color: var(--canopy); line-height: 1.5; }
+
+.error { background: var(--red-bg); border: 1px solid #FCA5A5; border-radius: 12px; padding: 14px 18px; font-size: 13px; color: var(--red); display: flex; align-items: center; gap: 8px; }
+.error svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+@media (max-width: 640px) {
+  header { padding: 20px; }
+  .founder-strip { padding: 12px 20px; }
+  .mode-tabs { padding: 0 20px; }
+  .main { padding: 24px 16px 60px; }
+  .card { padding: 20px; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .full { grid-column: 1; }
+  .campaign-summary { grid-template-columns: 1fr 1fr; }
+  .post-item { grid-template-columns: 1fr; }
+  .tips-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    <div class="header-leaf">
+      <svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 19.28A10 10 0 0 0 17 8zM12 22a9.97 9.97 0 0 0 5-1.34A14.94 14.94 0 0 0 12 8c-1.63 0-3.19.39-4.57 1.09A9.98 9.98 0 0 0 12 22z"/></svg>
+    </div>
+    <div>
+      <div class="header-title">Magic Cones <span>Content Studio</span></div>
+      <div class="header-sub">@magic_cones_plant_ice_cream · Newark, NJ</div>
+    </div>
+  </div>
+  <div class="header-badge">AI Powered</div>
+</header>
+
+<div class="founder-strip">
+  <span class="founder-tag">Founder</span>
+  <div class="founder-strip-text">
+    <strong>Rashena Burroughs</strong> — vegan since birth, Newark's Queen of Clean Cuisine. Built Magic Cones to give her staff a business of their own. "Food shouldn't just taste good — it should be good for your cells."
+  </div>
+</div>
+
+<div class="mode-tabs">
+  <button class="mode-tab active" onclick="switchMode('post')" id="tab-post">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+    Quick Post
+  </button>
+  <button class="mode-tab" onclick="switchMode('campaign')" id="tab-campaign">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Campaign Planner
+  </button>
+</div>
+
+<div class="main">
+
+  <div class="panel active" id="panel-post">
+    <div class="tips-row">
+      <div class="tip"><div class="tip-icon">⚡</div><div class="tip-title">Instant captions</div><div class="tip-text">3 ready-to-post options written in Rashena's authentic voice.</div></div>
+      <div class="tip"><div class="tip-icon">🌱</div><div class="tip-title">Story-driven</div><div class="tip-text">Every caption reflects the real Magic Cones mission and community roots.</div></div>
+      <div class="tip"><div class="tip-icon">📋</div><div class="tip-title">One-click copy</div><div class="tip-text">Caption + hashtags copied and ready to paste to Instagram.</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Post settings</div>
+      <div class="grid-2">
+        <div class="ctrl">
+          <label>Platform</label>
+          <select id="p-platform">
+            <option>Instagram</option>
+            <option>TikTok</option>
+            <option>Facebook</option>
+            <option>X / Twitter</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>Content type</label>
+          <select id="p-type">
+            <option value="flavor spotlight">Flavor spotlight</option>
+            <option value="new menu item">New menu item</option>
+            <option value="founder story (Rashena's journey)">Founder story</option>
+            <option value="staff spotlight (employee-owned business)">Staff spotlight</option>
+            <option value="behind the scenes">Behind the scenes</option>
+            <option value="community / UGC repost">Community / UGC</option>
+            <option value="educational (ingredients, certifications, vegan lifestyle)">Educational</option>
+            <option value="seasonal or holiday">Seasonal / holiday</option>
+            <option value="event or promotion">Event or promo</option>
+            <option value="Newark community pride">Newark pride</option>
+            <option value="customer review highlight">Review highlight</option>
+            <option value="health and wellness tip">Health & wellness</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>Flavor or item</label>
+          <select id="p-flavor">
+            <option value="Soursop">Soursop</option>
+            <option value="Cherry Vanilla">Cherry Vanilla</option>
+            <option value="Chocolate">Chocolate</option>
+            <option value="Vanilla">Vanilla</option>
+            <option value="Banana">Banana</option>
+            <option value="Waffle Taco">Waffle Taco</option>
+            <option value="Coconut Bowl">Coconut Bowl</option>
+            <option value="Apple Pie Nachos">Apple Pie Nachos</option>
+            <option value="Fried Oreo Cone (chickpea battered)">Fried Oreo Cone</option>
+            <option value="Vegan Slushie">Vegan Slushie</option>
+            <option value="Milkshakes (vanilla, chocolate or banana)">Milkshakes</option>
+            <option value="the full Magic Cones menu">Full menu / general</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>Tone</label>
+          <select id="p-tone">
+            <option value="warm, community-focused, and joyful">Warm & community</option>
+            <option value="playful and hype">Playful & hype</option>
+            <option value="educational and empowering">Educational</option>
+            <option value="poetic and sensory">Poetic & sensory</option>
+            <option value="bold and mission-driven">Bold & mission-driven</option>
+            <option value="personal and storytelling (from Rashena's perspective)">Personal / Rashena's voice</option>
+          </select>
+        </div>
+        <div class="ctrl full">
+          <label>Campaign notes <span>(optional)</span></label>
+          <input type="text" id="p-notes" placeholder="e.g. Eid Mubarak special, 2-for-1 Saturday, Vegan Chess & Chill event..." />
+        </div>
+      </div>
+      <button class="btn-generate" id="postBtn" onclick="generatePost()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+        Generate 3 caption options
+      </button>
+    </div>
+    <div id="post-output"></div>
+  </div>
+
+  <div class="panel" id="panel-campaign">
+    <div class="tips-row">
+      <div class="tip"><div class="tip-icon">📅</div><div class="tip-title">4-week plan</div><div class="tip-text">Full campaign with weekly themes, daily post ideas and captions.</div></div>
+      <div class="tip"><div class="tip-icon">🎨</div><div class="tip-title">Multi-platform</div><div class="tip-text">Posts scheduled across Instagram, TikTok and Facebook.</div></div>
+      <div class="tip"><div class="tip-icon">🚀</div><div class="tip-title">Ready to execute</div><div class="tip-text">Copy individual posts or use the full plan as your content calendar.</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Campaign settings</div>
+      <div class="grid-3">
+        <div class="ctrl">
+          <label>Month</label>
+          <select id="c-month">
+            <option>January</option><option>February</option><option>March</option>
+            <option>April</option><option>May</option><option>June</option>
+            <option>July</option><option>August</option><option>September</option>
+            <option>October</option><option>November</option><option>December</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>Campaign theme</label>
+          <select id="c-theme">
+            <option value="seasonal (based on the month, weather, and Newark community events)">Seasonal</option>
+            <option value="flavor launch (spotlight and introduce a featured flavor)">Flavor launch</option>
+            <option value="holiday or cultural celebration (be inclusive of all cultures in Newark)">Holiday / cultural</option>
+            <option value="community and Newark pride (highlight Rashena's commitment to Newark)">Newark community</option>
+            <option value="health and wellness (plant-based lifestyle, clean eating, Rashena's philosophy)">Health & wellness</option>
+            <option value="behind the scenes and founder story (Rashena's journey, staff, mission)">Founder / brand story</option>
+            <option value="employee spotlight (Magic Cones is employee-owned — celebrate the team)">Employee spotlight</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>Featured item</label>
+          <select id="c-flavor">
+            <option value="Soursop">Soursop</option>
+            <option value="Cherry Vanilla">Cherry Vanilla</option>
+            <option value="Chocolate">Chocolate</option>
+            <option value="Vanilla">Vanilla</option>
+            <option value="Banana">Banana</option>
+            <option value="Waffle Taco">Waffle Taco</option>
+            <option value="Coconut Bowl">Coconut Bowl</option>
+            <option value="Apple Pie Nachos">Apple Pie Nachos</option>
+            <option value="Seasonal special">Seasonal special</option>
+            <option value="full menu">Full menu</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>Primary platform</label>
+          <select id="c-platform">
+            <option value="Instagram">Instagram (primary)</option>
+            <option value="TikTok">TikTok (primary)</option>
+            <option value="all platforms equally">All platforms</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>Posting frequency</label>
+          <select id="c-freq">
+            <option value="3 times per week (Monday, Wednesday, Friday)">3x per week</option>
+            <option value="5 times per week (Monday through Friday)">5x per week</option>
+            <option value="daily (7 posts per week)">Daily</option>
+            <option value="2 times per week">2x per week</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>Overall tone</label>
+          <select id="c-tone">
+            <option value="warm, community-focused, and joyful">Warm & community</option>
+            <option value="playful and hype-driven">Playful & hype</option>
+            <option value="educational and empowering">Educational</option>
+            <option value="personal and story-driven (Rashena's voice)">Personal / story-driven</option>
+            <option value="mixed — vary tone each week to keep content fresh">Mixed</option>
+          </select>
+        </div>
+        <div class="ctrl full">
+          <label>Campaign goals or notes <span>(optional)</span></label>
+          <textarea id="c-notes" placeholder="e.g. Push online ordering, celebrate Ramadan, drive weekend foot traffic, grow TikTok, highlight employee ownership..."></textarea>
+        </div>
+      </div>
+      <button class="btn-generate" id="campaignBtn" onclick="generateCampaign()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Generate 4-week campaign plan
+      </button>
+    </div>
+    <div id="campaign-output"></div>
+  </div>
+
+</div>
+
+<script>
+// ── REPLACE THIS WITH YOUR API KEY ──
+var API_KEY = 'PASTE-YOUR-API-KEY-HERE';
+
+var SYSTEM = 'You are the social media strategist and copywriter for Magic Cones Plant-Based Ice Cream Parlor at 550-552 Central Ave, Newark, NJ. Instagram: @magic_cones_plant_ice_cream.\n\nFOUNDER — RASHENA BURROUGHS:\n- Been vegan since birth, lactose intolerant her whole life, advocated for animals as a child\n- Born in Summit, raised in East Orange, chose Newark deliberately when everyone told her to go to Hoboken or Montclair\n- Owns 5 vegan/health businesses on the same block in Newark West Ward: Blueberry Cafe, Zucchini Bar, Aqua Phit Water Bar and Luxury Gym, Magic Cones, Plants & Poets Cafe\n- Created Magic Cones specifically to give her long-time staff a business of their own — employees share net profits each quarter\n- Her children run the businesses: Chef Joe is exec chef at Zucchini Bar, Anthony runs operations and HR, Aminah is exec chef at Plants & Poets\n- Senator Cory Booker (a vegan) held his birthday at Blueberry Cafe on day two\n- Runs Vegan Chess & Chill — free community events at the Water Bar\n- Philosophy: Food shouldnt just taste good — it should be good for your cells\n- Quote: Just because they build McDonalds and Burger King in the neighborhood doesnt mean thats all people want. They just dont have access to better options.\n\nMAGIC CONES:\n- 100% plant-based, organic, kosher certified, halal certified\n- Monkfruit sweetened, coconut milk base, secret family recipes\n- Tagline: From the garden to the cone\n- Flavors: vanilla, chocolate, cherry vanilla, soursop, banana\n- Creations: waffle tacos, coconut bowls, apple pie nachos, chickpea-battered fried Oreo cones, vegan slushies, milkshakes\n- Build-your-own toppings: hempseeds, sprinkles, chocolate chips, cookies, cake, nuts, fruit\n- Balloons and birthday cards in store\n\nVOICE: Warm, inclusive, never preachy. Celebrate Newark and its diverse community. Sensory language. Reference Rashenas story naturally. Celebrate employee ownership when relevant. Never mention competitors. Always end with community CTA.';
+
+function switchMode(mode) {
+  document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.mode-tab').forEach(function(t) { t.classList.remove('active'); });
+  document.getElementById('panel-' + mode).classList.add('active');
+  document.getElementById('tab-' + mode).classList.add('active');
+}
+
+function callClaude(userPrompt) {
+  return fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': API_KEY,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2000,
+      system: SYSTEM,
+      messages: [{ role: 'user', content: userPrompt }]
+    })
+  }).then(function(res) {
+    return res.json();
+  }).then(function(data) {
+    var text = data.content.map(function(i) { return i.text || ''; }).join('');
+    return text.replace(/```json|```/g, '').trim();
+  });
+}
+
+var postResults = [];
+var activePostTab = 0;
+
+function generatePost() {
+  var platform = document.getElementById('p-platform').value;
+  var type = document.getElementById('p-type').value;
+  var flavor = document.getElementById('p-flavor').value;
+  var tone = document.getElementById('p-tone').value;
+  var notes = document.getElementById('p-notes').value;
+
+  var btn = document.getElementById('postBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div style="width:18px;height:18px;border:2px solid #C0DD97;border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;"></div> Writing...';
+  document.getElementById('post-output').innerHTML = '<div class="card loading"><div class="loading-ring"></div><p>Crafting captions in Magic Cones voice...</p></div>';
+
+  var prompt = 'Write 3 different ' + platform + ' post options for Magic Cones.\nContent type: ' + type + '\nFlavor/item: ' + flavor + '\nTone: ' + tone + '\nNotes: ' + (notes || 'none') + '\n\nReturn ONLY valid JSON, no markdown:\n{"posts":[{"label":"Option A","caption":"...","hashtags":["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6","#tag7","#tag8"]},{"label":"Option B","caption":"...","hashtags":["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6","#tag7","#tag8"]},{"label":"Option C","caption":"...","hashtags":["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6","#tag7","#tag8"]}]}';
+
+  callClaude(prompt).then(function(raw) {
+    var parsed = JSON.parse(raw);
+    postResults = parsed.posts;
+    activePostTab = 0;
+    renderPost(platform);
+  }).catch(function() {
+    document.getElementById('post-output').innerHTML = errorHTML();
+  }).finally(function() {
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg> Generate 3 caption options';
+  });
+}
+
+function renderPost(platform) {
+  var r = postResults[activePostTab];
+  var tabs = postResults.map(function(p, i) {
+    return '<button class="result-tab ' + (i === activePostTab ? 'active' : '') + '" onclick="switchPostTab(' + i + ',\'' + platform + '\')">' + p.label + '</button>';
+  }).join('');
+
+  document.getElementById('post-output').innerHTML = '<div class="card"><div class="card-title">Generated captions</div><div class="result-tabs">' + tabs + '</div><div class="result-card"><div class="result-platform"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/></svg> ' + platform + ' · @magic_cones_plant_ice_cream</div><div class="caption-text" id="captionText">' + r.caption + '</div><div class="hashtag-text" id="hashtagText">' + r.hashtags.join(' ') + '</div><div class="result-footer"><div class="chips"><span class="chip">' + r.caption.length + ' chars</span><span class="chip">' + r.hashtags.length + ' hashtags</span></div><button class="btn-sm dark" onclick="copyPost()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy caption + hashtags</button></div></div><div class="action-row"><button class="btn-sm" onclick="generatePost()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Regenerate</button><button class="btn-sm" onclick="document.getElementById(\'post-output\').innerHTML=\'\'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Clear</button></div></div>';
+}
+
+function switchPostTab(i, platform) { activePostTab = i; renderPost(platform); }
+
+function copyPost() {
+  var c = document.getElementById('captionText').innerText;
+  var h = document.getElementById('hashtagText').innerText;
+  navigator.clipboard.writeText(c + '\n\n' + h).catch(function(){});
+  var btn = document.querySelector('.btn-sm.dark');
+  var orig = btn.innerHTML;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+  setTimeout(function() { btn.innerHTML = orig; }, 2000);
+}
+
+function generateCampaign() {
+  var month = document.getElementById('c-month').value;
+  var theme = document.getElementById('c-theme').value;
+  var flavor = document.getElementById('c-flavor').value;
+  var platform = document.getElementById('c-platform').value;
+  var freq = document.getElementById('c-freq').value;
+  var tone = document.getElementById('c-tone').value;
+  var notes = document.getElementById('c-notes').value;
+
+  var btn = document.getElementById('campaignBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div style="width:18px;height:18px;border:2px solid #C0DD97;border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;"></div> Building your campaign...';
+  document.getElementById('campaign-output').innerHTML = '<div class="card loading"><div class="loading-ring"></div><p>Building your ' + month + ' campaign plan...</p></div>';
+
+  var prompt = 'Create a full 4-week social media campaign plan for Magic Cones for ' + month + '.\n\nCampaign details:\n- Theme: ' + theme + '\n- Featured item: ' + flavor + '\n- Primary platform: ' + platform + '\n- Posting frequency: ' + freq + '\n- Tone: ' + tone + '\n- Goals/notes: ' + (notes || 'none') + '\n\nDraw on Rashena Burroughs story, employee-ownership model, Newark community roots, and brand mission where relevant.\n\nReturn ONLY valid JSON:\n{"campaign_name":"...","campaign_tagline":"...","month":"' + month + '","weeks":[{"week":1,"theme":"...","goal":"...","posts":[{"day":"Monday","platform":"Instagram","content_type":"...","idea":"...","caption_preview":"...","hashtags":["#tag1","#tag2","#tag3","#tag4","#tag5"]}]}]}';
+
+  callClaude(prompt).then(function(raw) {
+    var parsed = JSON.parse(raw);
+    renderCampaign(parsed);
+  }).catch(function() {
+    document.getElementById('campaign-output').innerHTML = errorHTML();
+  }).finally(function() {
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Generate 4-week campaign plan';
+  });
+}
+
+var platformColors = {'Instagram':'#E1306C','TikTok':'#010101','Facebook':'#1877F2','X / Twitter':'#000','default':'#639922'};
+
+function renderCampaign(data) {
+  var totalPosts = data.weeks.reduce(function(sum, w) { return sum + w.posts.length; }, 0);
+
+  var summaryHTML = '<div class="campaign-summary"><div class="summary-stat"><div class="summary-num">4</div><div class="summary-label">Weeks planned</div></div><div class="summary-stat"><div class="summary-num">' + totalPosts + '</div><div class="summary-label">Total posts</div></div><div class="summary-stat"><div class="summary-num">3</div><div class="summary-label">Platforms</div></div><div class="summary-stat"><div class="summary-num">AI</div><div class="summary-label">All captions ready</div></div></div>';
+
+  var headerHTML = '<div class="campaign-header"><div class="campaign-title">' + data.campaign_name + '</div><div class="campaign-meta">' + data.campaign_tagline + ' · ' + data.month + ' · Magic Cones</div></div>';
+
+  var weeksHTML = data.weeks.map(function(week) {
+    var postsHTML = week.posts.map(function(post) {
+      var color = platformColors[post.platform] || platformColors.default;
+      var id = Math.random().toString(36).substr(2, 9);
+      return '<div class="post-item"><div><div class="post-day">' + post.day + '</div><span class="post-platform-tag" style="background:' + color + '18;color:' + color + ';">' + post.platform + '</span></div><div><div class="post-content-type">' + post.content_type + '</div><div class="post-idea">' + post.idea + '</div><div class="post-caption-preview" id="cap-' + id + '">' + post.caption_preview + '</div><div style="font-size:11px;color:var(--meadow);margin-top:4px;" id="hash-' + id + '">' + post.hashtags.join(' ') + '</div></div><button class="post-copy-btn" onclick="copyPostItem(\'cap-' + id + '\',\'hash-' + id + '\',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy</button></div>';
+    }).join('');
+    return '<div class="week-card"><div class="week-header"><div><div class="week-label">Week ' + week.week + ' — ' + week.theme + '</div><div class="week-theme">Goal: ' + week.goal + '</div></div><span class="chip">' + week.posts.length + ' posts</span></div><div class="week-body">' + postsHTML + '</div></div>';
+  }).join('');
+
+  document.getElementById('campaign-output').innerHTML = headerHTML + summaryHTML + weeksHTML;
+}
+
+function copyPostItem(capId, hashId, btn) {
+  var cap = document.getElementById(capId).innerText;
+  var hash = document.getElementById(hashId).innerText;
+  navigator.clipboard.writeText(cap + '\n\n' + hash).catch(function(){});
+  var orig = btn.innerHTML;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+  setTimeout(function() { btn.innerHTML = orig; }, 2000);
+}
+
+function errorHTML() {
+  return '<div class="card"><div class="error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Generation failed — please try again.</div></div>';
+}
+
+var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+document.getElementById('c-month').value = months[new Date().getMonth()];
+</script>
+</body>
+</html>
